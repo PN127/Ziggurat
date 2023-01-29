@@ -49,46 +49,8 @@ namespace Ziggurat
                 }
                 
             }
-            
-
-
-            //switch (UnitColour)
-            //{
-            //    case Colour.Red:
-            //        SearchTarget(ConfigurationManager.unitsBlue, ConfigurationManager.unitsGreen);
-            //        break;
-            //    case Colour.Green:
-            //        SearchTarget(ConfigurationManager.unitsBlue, ConfigurationManager.unitsRed);
-            //        break;
-            //    case Colour.Blue:
-            //        SearchTarget(ConfigurationManager.unitsRed, ConfigurationManager.unitsGreen);
-            //        break;
-            //}
-
         }
 
-        private void SearchTarget(List<GameObject> Enemy1, List<GameObject> Enemy2)
-        {
-            float minDistance = Mathf.Infinity;
-            foreach (GameObject enemy in Enemy1)
-            {
-                var distance = Vector3.Distance(gameObject.transform.position, enemy.transform.position);
-                if (distance < distanceAttack && distance < minDistance)
-                {
-                    minDistance = distance;
-                    Target = enemy.transform;
-                }                    
-            }
-            foreach (GameObject enemy in Enemy2)
-            {
-                var distance = Vector3.Distance(gameObject.transform.position, enemy.transform.position);
-                if (distance < distanceAttack && distance < minDistance)
-                {
-                    minDistance = distance;
-                    Target = enemy.transform;
-                }
-            }
-        }
 
         public Vector3 GetUpdateIgnoreAxis(Vector3 vector, IgnoreAxisType ignore = IgnoreAxisType.None)
         {
