@@ -85,18 +85,17 @@ namespace Ziggurat
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 100)
+            while (a < 2)
             {
                 var unit = Instantiate(_unit);
                 unit.transform.position = transform.position + new Vector3(0, 7, 0);
                 var unitManager = unit.GetComponent<UnitManager>();
-                //unitManager.Target = _targetForUnit;
                 unitManager.Health = _healthUnit;
                 unitManager.Speed = _speedUnit;
                 unitManager.FastAttackDamage = _fastAttackDamageUnit;
                 unitManager.SlowAttackDamage = _slowAttackDamageUnit;
                 unitManager.FrequencyFastAttackPerMinute = _frequencyFastAttackPerMinuteUnit;
-                unitManager.UnitColour = _gateColour;
+                unitManager.Colour = _gateColour;
                 _units.Add(unit);
                 a++;
                 yield return new WaitForSeconds(_spawnReload);
