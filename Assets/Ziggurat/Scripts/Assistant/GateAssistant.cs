@@ -12,12 +12,12 @@ namespace Ziggurat
         [SerializeField]
         private GameObject _unit;
         [SerializeField]
-        private Transform _targetForUnit;
-        [SerializeField]
         private GameObject _panel;
         [SerializeField]
         private Colour _gateColour;
         public Colour Get_gateColour => _gateColour;
+
+        private SteeringBehaviorData GetSteeringBehaviorData;
 
         [SerializeField]
         private Text _healthText;
@@ -48,6 +48,8 @@ namespace Ziggurat
 
         void Start()
         {
+            GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
+
             SaveParams();
 
             switch (_gateColour)
@@ -85,10 +87,11 @@ namespace Ziggurat
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 2)
+            while (a < 15)
             {
+                var data = GetSteeringBehaviorData;
                 var unit = Instantiate(_unit);
-                unit.transform.position = transform.position + new Vector3(0, 7, 0);
+                //unit.transform.position = transform.position + new Vector3(0, 7, 0);
                 var unitManager = unit.GetComponent<UnitManager>();
                 unitManager.Health = _healthUnit;
                 unitManager.Speed = _speedUnit;
@@ -96,6 +99,8 @@ namespace Ziggurat
                 unitManager.SlowAttackDamage = _slowAttackDamageUnit;
                 unitManager.FrequencyFastAttackPerMinute = _frequencyFastAttackPerMinuteUnit;
                 unitManager.Colour = _gateColour;
+                unitManager.Target = data.Center.transform;
+                unitManager.State = AIStateType.Move_Seek;
                 _units.Add(unit);
                 a++;
                 yield return new WaitForSeconds(_spawnReload);

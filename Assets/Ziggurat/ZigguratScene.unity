@@ -190,7 +190,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1
+  m_Text: 10
 --- !u!222 &5390952
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -948,7 +948,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 1
+  m_Text: 10
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -1155,7 +1155,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1
+  m_Text: 10
 --- !u!222 &93929546
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1246,7 +1246,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 2129645122}
   m_HandleRect: {fileID: 133536910}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 1
   m_MaxValue: 10
   m_WholeNumbers: 1
   m_Value: 5
@@ -4622,7 +4622,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 1150485788}
   m_HandleRect: {fileID: 1164352198}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 1
   m_MaxValue: 10
   m_WholeNumbers: 1
   m_Value: 5
@@ -7161,7 +7161,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unit: {fileID: 4794905035096389605, guid: 774517d1ed396fc48b4dadf5fae6f105, type: 3}
-  _targetForUnit: {fileID: 1867097315}
   _panel: {fileID: 662882608}
   _gateColour: 0
   _healthText: {fileID: 506550855}
@@ -7282,7 +7281,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 1
+  m_Text: 10
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -7939,9 +7938,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 800312143}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 10
+  m_MaxValue: 40
   m_WholeNumbers: 1
-  m_Value: 5
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -9621,7 +9620,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 257983b39ec65a248a27b31a6ed263bf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.45999908
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 257983b39ec65a248a27b31a6ed263bf, type: 3}
       propertyPath: m_LocalRotation.x
@@ -11585,7 +11584,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 1
+  m_Text: 10
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -12462,7 +12461,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unit: {fileID: 3538023434005798179, guid: 0c6cfcdbf75a5a747b9cefea2ec34303, type: 3}
-  _targetForUnit: {fileID: 1867097315}
   _panel: {fileID: 2115160115}
   _gateColour: 2
   _healthText: {fileID: 1223436148}
@@ -13286,7 +13284,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1
+  m_Text: 10
 --- !u!222 &1727043606
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14328,7 +14326,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1867097314}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -14359,8 +14357,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _steeringBehaviorData:
-    MaxVelcity: 5
-    MaxSpeed: 10
+    MaxVelcity: 10
+    MaxSpeed: 4
+    ArrivalDistance: 1.5
+    WanderCenterDistance: 10
+    WanderRadius: 12
+    WanderAngelRange: 10
+    Center: {fileID: 1867097314}
 --- !u!1 &1868062006
 GameObject:
   m_ObjectHideFlags: 0
@@ -14963,7 +14966,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 257983b39ec65a248a27b31a6ed263bf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.45999908
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 257983b39ec65a248a27b31a6ed263bf, type: 3}
       propertyPath: m_LocalRotation.x
@@ -16204,7 +16207,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 593549978}
   m_HandleRect: {fileID: 333485188}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 1
   m_MaxValue: 10
   m_WholeNumbers: 1
   m_Value: 5
@@ -16258,7 +16261,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unit: {fileID: 2598592078265873215, guid: 3d000b867dd36a04480164d25c935d8f, type: 3}
-  _targetForUnit: {fileID: 1867097315}
   _panel: {fileID: 9050084}
   _gateColour: 1
   _healthText: {fileID: 38276858}

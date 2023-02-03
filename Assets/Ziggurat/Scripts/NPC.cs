@@ -13,8 +13,10 @@ namespace Ziggurat
         public float FrequencyFastAttackPerMinute { get; set; }
         public float DistanceAttack { get; set; }
         public float DistanceDetection { get; set; }
+        public float WanderAngel { get; set; }
 
         public Colour Colour { get; set; }
+        public AIStateType State { get; set; }
 
         protected int id { get; set; }
     }

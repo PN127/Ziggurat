@@ -9,10 +9,20 @@ namespace Ziggurat
 	[Serializable]
 	public struct SteeringBehaviorData
 	{
-		[Tooltip("Велечина стремления к цели"), SerializeField, Range(1f, 10f)]
+		[Tooltip("Велечина стремления к цели"), SerializeField, Range(1f, 100f)]
 		public float MaxVelcity;
 		[Tooltip("Максимальная скорость"), SerializeField, Range(1f, 10f)]
 		public float MaxSpeed;
+		[Tooltip("Расстояние до начала прибытия"), SerializeField, Range(1f, 100f)]
+		public float ArrivalDistance;
+		[Tooltip("Расстояние до центра окружности блуждания"), SerializeField, Range(1f, 100f)]
+		public float WanderCenterDistance;
+		[Tooltip("Радиус окружности блуждания"), SerializeField, Range(1f, 100f)]
+		public float WanderRadius;
+		[Tooltip("Угл смещения при блуждании"), SerializeField, Range(1f, 100f)]
+		public float WanderAngelRange;
+
+		public GameObject Center;
 	}
 
 	public enum AIStateType : byte
