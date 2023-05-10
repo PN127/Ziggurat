@@ -78,7 +78,9 @@
     <Compile Include="Assets\Ziggurat\Scripts\ConfigurationManager.cs" />
     <Compile Include="Assets\Ziggurat\Scripts\Extended.cs" />
     <Compile Include="Assets\Ziggurat\Scripts\NPC.cs" />
-    <Compile Include="Assets\Ziggurat\Scripts\UIManager.cs" />
+    <Compile Include="Assets\Ziggurat\Scripts\UI\Panel_Settings.cs" />
+    <Compile Include="Assets\Ziggurat\Scripts\UI\Panel_Static.cs" />
+    <Compile Include="Assets\Ziggurat\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Ziggurat\Scripts\UnitEnvironment.cs" />
     <Compile Include="Assets\Ziggurat\Scripts\UnitManager.cs" />
     <Reference Include="UnityEngine">

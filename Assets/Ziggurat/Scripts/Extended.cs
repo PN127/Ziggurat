@@ -25,6 +25,12 @@ namespace Ziggurat
 		public GameObject Center;
 	}
 
+	public enum AttackType : byte
+    {
+		Slow = 0,
+		Fast = 1,
+    }
+
 	public enum AIStateType : byte
 	{
 		None = 0,

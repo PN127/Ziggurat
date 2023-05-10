@@ -87,11 +87,10 @@ namespace Ziggurat
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 15)
+            while (a < 100)
             {
                 var data = GetSteeringBehaviorData;
                 var unit = Instantiate(_unit);
-                //unit.transform.position = transform.position + new Vector3(0, 7, 0);
                 var unitManager = unit.GetComponent<UnitManager>();
                 unitManager.Health = _healthUnit;
                 unitManager.Speed = _speedUnit;
