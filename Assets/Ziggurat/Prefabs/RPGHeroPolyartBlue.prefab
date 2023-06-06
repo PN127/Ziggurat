@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 0}
+  MyCanvas: {fileID: 0}
+  healt: 0
 --- !u!1001 &6899362196514021481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20,6 +22,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3747165399077895431, guid: 1be16647de1030a4c95a6925ba05db92,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747165399077895431, guid: 1be16647de1030a4c95a6925ba05db92,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7971482898358105655, guid: 1be16647de1030a4c95a6925ba05db92,
         type: 3}
       propertyPath: m_Mass

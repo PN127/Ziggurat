@@ -19,6 +19,7 @@ namespace Ziggurat
 		/// </summary>
 		public event EventHandler OnEndAnimation;
 
+
 		/// <summary>
 		/// Этот метод нужно вызвать/подписать на передвижение в Unit, чтобы подключить анимацию стояния или хотьбы
 		/// </summary>
@@ -51,5 +52,6 @@ namespace Ziggurat
 			if (result == "die") Destroy(gameObject);
 			OnEndAnimation.Invoke(null, null);
 		}
-	}
+
+    }
 }

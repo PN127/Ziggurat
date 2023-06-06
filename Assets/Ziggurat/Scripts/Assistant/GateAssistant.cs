@@ -8,6 +8,9 @@ namespace Ziggurat
 {
     public class GateAssistant : MonoBehaviour
     {
+        private Panel_Static ps;
+        private SteeringBehaviorData GetSteeringBehaviorData;
+        private List<GameObject> _units;
 
         [SerializeField]
         private GameObject _unit;
@@ -17,9 +20,8 @@ namespace Ziggurat
         private Colour _gateColour;
         public Colour Get_gateColour => _gateColour;
 
-        private SteeringBehaviorData GetSteeringBehaviorData;
-
-        [SerializeField]
+        [Space]
+        [SerializeField, Header("Передача параметров юнитам")]
         private Text _healthText;
         [SerializeField]
         private Text _speedText;
@@ -28,29 +30,26 @@ namespace Ziggurat
         [SerializeField]
         private Text _fastAttackDamageText;
         [SerializeField]
-        private Slider _spawnReloadValue;
+        private Slider _spawnReload;
         [SerializeField]
-        private Slider _frequencyFastAttackPerMinuteValue;
+        private Slider _chanceMiss;
+        [SerializeField]
+        private Slider _chanceCriticalDamage;
+        [SerializeField]
+        private Slider _frequencyFastAttackPerMinute;
 
-        private List<GameObject> _units;
+        [Space]
+        [SerializeField, Header("Реализация здоровья")]
+        private Camera camera; //to do
 
-        private float _healthUnit;
-        private float _speedUnit;        
-        private float _slowAttackDamageUnit;
-        private float _fastAttackDamageUnit;
-        private float _spawnReload;
-        private float _frequencyFastAttackPerMinuteUnit;
 
-        private void Awake()
-        {
-            RayCast.ShowEvent += (colour) => SaveParams();
-        }
+
+        
 
         void Start()
         {
             GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
-
-            SaveParams();
+            ps = new Panel_Static();
 
             switch (_gateColour)
             {
@@ -72,37 +71,36 @@ namespace Ziggurat
             
         }
 
-       
-
-        private void SaveParams()
+        private void unitDead()
         {
-            _healthUnit = float.Parse(_healthText.text);
-            _speedUnit = float.Parse(_speedText.text);
-            _slowAttackDamageUnit = float.Parse(_slowAttackDamageText.text);
-            _fastAttackDamageUnit = float.Parse(_fastAttackDamageText.text);
-            _spawnReload = _spawnReloadValue.value;
-            _frequencyFastAttackPerMinuteUnit = _frequencyFastAttackPerMinuteValue.value;
+            ps.SetCountToDictionary(false, _gateColour);
         }
 
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 100)
+            while (a < 1)
             {
                 var data = GetSteeringBehaviorData;
                 var unit = Instantiate(_unit);
                 var unitManager = unit.GetComponent<UnitManager>();
-                unitManager.Health = _healthUnit;
-                unitManager.Speed = _speedUnit;
-                unitManager.FastAttackDamage = _fastAttackDamageUnit;
-                unitManager.SlowAttackDamage = _slowAttackDamageUnit;
-                unitManager.FrequencyFastAttackPerMinute = _frequencyFastAttackPerMinuteUnit;
+                unitManager.Health = float.Parse(_healthText.text);
+                unitManager.Speed = float.Parse(_speedText.text);
+                unitManager.FastAttackDamage = float.Parse(_fastAttackDamageText.text);
+                unitManager.StrongAttackDamage = float.Parse(_slowAttackDamageText.text);
+                unitManager.FrequencyFastAttackPerMinute = _frequencyFastAttackPerMinute.value;
                 unitManager.Colour = _gateColour;
                 unitManager.Target = data.Center.transform;
                 unitManager.State = AIStateType.Move_Seek;
+                unitManager.ChanceMiss = _chanceMiss.value;
+                unitManager.ChanceCriticalDamage = _chanceCriticalDamage.value;
+                unitManager.DeadEvent += unitDead;
+                unitManager.Id = a;
                 _units.Add(unit);
                 a++;
-                yield return new WaitForSeconds(_spawnReload);
+                ps.SetCountToDictionary(true, _gateColour);
+                ps.SetTimeToCreat(_gateColour, _spawnReload.value);
+                yield return new WaitForSeconds(_spawnReload.value);
             }
         }
     }

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 0}
+  MyCanvas: {fileID: 0}
+  healt: 0
 --- !u!1001 &5383751496841563765
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20,6 +22,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3747165399077895431, guid: 1be16647de1030a4c95a6925ba05db92,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3747165399077895431, guid: 1be16647de1030a4c95a6925ba05db92,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7971482898358105654, guid: 1be16647de1030a4c95a6925ba05db92,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7971482898358105655, guid: 1be16647de1030a4c95a6925ba05db92,
         type: 3}
       propertyPath: m_Mass
@@ -95,6 +112,11 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 4ff977f107e2ffb40a708ee6e7549889, type: 2}
+    - target: {fileID: 8239127963209113445, guid: 1be16647de1030a4c95a6925ba05db92,
+        type: 3}
+      propertyPath: m_Value
+      value: 0.507
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1be16647de1030a4c95a6925ba05db92, type: 3}
 --- !u!1 &2598592078265873215 stripped

@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 namespace Ziggurat
 {
@@ -10,13 +12,19 @@ namespace Ziggurat
     public class UnitManager : NPC
     {
         private UnitEnvironment _environment;
+        private Configuration _config;
         private Rigidbody _rb;
-
-        public Transform Target;
         private SteeringBehaviorData GetSteeringBehaviorData;
         private List<GameObject> _family;
         private Coroutine _figth;
         private AttackType SelectAttack;
+        private AnimationType SelectAnimation;
+        private Slider _sliderHealth;
+
+        public Transform Target;
+        private Canvas MyCanvas;
+        public float healt;
+
 
         public float Mass => _rb.mass;
 
@@ -25,14 +33,19 @@ namespace Ziggurat
         public delegate void NotificationDeadDelegate();
         public event NotificationDeadDelegate DeadEvent;
 
+
         void Start()
         {
-            SelectAttack = AttackType.Slow;
-            DistanceDetection = 10;
-            DistanceAttack = 2;
             _environment = GetComponent<UnitEnvironment>();
             _rb = GetComponent<Rigidbody>();
             GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
+
+            _sliderHealth.maxValue = Health;
+            _sliderHealth.value = Health;
+            SelectAttack = AttackType.Strong;
+            DistanceDetection = GetSteeringBehaviorData.DetectionDistance;
+            DistanceAttack = GetSteeringBehaviorData.AttackDistance;
+            
 
             switch (Colour)
             {
@@ -49,8 +62,7 @@ namespace Ziggurat
 
         }
 
-
-
+       
         private void FixedUpdate()
         {
             MoveUnity();
@@ -59,6 +71,8 @@ namespace Ziggurat
                 AttackZone();
             else
                 SearchaTarget();
+
+            MyCanvas.transform.LookAt(Camera.main.transform);
         }
 
         //Поведение бота
@@ -68,12 +82,18 @@ namespace Ziggurat
             {
                 case AIStateType.Move_Seek:
                     OnSeek();
+                    _environment.Moving(1);
                     break;
                 case AIStateType.Move_Arrival:
                     OnArrivel();
+                    _environment.Moving(0);
                     break;
                 case AIStateType.Move_Wander:
                     OnWander();
+                    _environment.Moving(1);
+                    break;
+                case AIStateType.Fight:
+                    OnFight();
                     break;
                     //case AIStateType.Wait:                   
                     //    break;
@@ -99,16 +119,119 @@ namespace Ziggurat
                     }
                     State = AIStateType.Move_Seek;
                     Target.GetComponent<UnitManager>().DeadEvent += TargetDead;
+                    Debug.Log($"my name - {gameObject.name}. Target detected {Target.name}");
                 }
             }
         }
-
-        private void Wait()
+        
+        //проверка аттакующей зоны
+        private void AttackZone()
         {
-            //transform.position += Vector3.up * Time.deltaTime;
+            var distance = Vector3.Distance(gameObject.transform.position, Target.transform.position);
+            
+            if (distance < DistanceAttack && !_attacking)
+            {
+                _attacking = true;
+                State = AIStateType.Fight;
+                _figth = StartCoroutine(Fight());
+                                
+            }
+            else if (distance > DistanceAttack && distance < DistanceDetection && _attacking)    //режим приследования, если противник вне радиуса аттаки
+            {
+                _attacking = false;
+                State = AIStateType.Move_Seek;
+
+                if (_figth == null) return;
+                StopCoroutine(_figth);
+                _figth = null;
+            }
+            else if (distance > DistanceDetection && _attacking)
+            {
+                _attacking = false;
+                Target = null;
+                State = AIStateType.Move_Wander;
+                if (_figth == null) return;
+                StopCoroutine(_figth);
+                _figth = null;
+
+            }
+
+            //else if(distance > DistanceDetection)     //Задел на будущее. Если противник выходит из радиуса обнаружения бот переходит в блуждающее состояние
+            //{
+            //    State = AIStateType.Move_Wander;
+            //}
         }
 
-        //Метод обрабатывает поведение бота после смерти цели
+
+        //Нанесение урона
+        private void TakeDamage()
+        {
+            if (Target == null)
+            {
+                TargetDead();
+                return;
+            }
+
+            float damageCount = -1;
+
+            //Сопоставление урона типу атаки
+            switch(SelectAttack)
+            {
+                case AttackType.Strong:
+                    damageCount = StrongAttackDamage;
+                    break;
+                case AttackType.Fast:
+                    damageCount = FastAttackDamage;
+                    break;
+            }
+            if (damageCount == -1)
+            {
+                Debug.LogWarning($"Неверно указан тип аттаки или урон выбранной атаки. Проверьте данные");
+            }
+
+            if (ChanceChangeAttack(ChanceMiss))
+            {
+                Debug.LogWarning($"{Colour}: I'm missing :( ");
+                return;
+            }
+
+            if (ChanceChangeAttack(ChanceCriticalDamage))
+            {
+                damageCount += damageCount;
+                Debug.LogWarning($"{Colour}: x2 Damage {damageCount} to {Target.GetComponent<UnitManager>().Colour}"/*to do*/);
+            }
+
+
+            Target.GetComponent<UnitManager>().GetDamage(damageCount, name/*to do*/);
+        }
+
+        //Получение урона
+        public void GetDamage(float damageCount, string killer/*to do*/)
+        {
+            
+            Health -= damageCount;
+            _sliderHealth.value = Health;
+            if (Health <= 0)
+            {
+                if (Target != null)
+                    Target.GetComponent<UnitManager>().DeadEvent -= TargetDead;     //Отписка от события смерти цели
+
+                SelectAnimation = AnimationType.Die;
+                _family.Remove(gameObject);
+                //gameObject.SetActive(false);
+                StopAllCoroutines();
+
+                DeadEvent?.Invoke();
+
+                Debug.LogWarning($"I {Colour} dead. My killer - {killer}, Damage {damageCount}"/*to do*/);
+                _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
+                Destroy(this);
+            }
+            Debug.LogWarning($"{killer} - Trigger: {gameObject.name}, Damage {damageCount}"/*to do*/);
+
+        }
+
+        //поведение бота после смерти цели
         private void TargetDead()
         {
             State = AIStateType.Move_Wander;
@@ -120,95 +243,30 @@ namespace Ziggurat
             _figth = null;
         }
 
-        //проверка аттакующей зоны
-        private void AttackZone()
-        {
-            var distance = Vector3.Distance(gameObject.transform.position, Target.transform.position);
-            if (distance < DistanceAttack && !_attacking)   //режим аттаки, если противник в радиусе атаки
-            {
-                _attacking = true;
-                _figth = StartCoroutine(Fight());
-                State = AIStateType.Move_Arrival;
-            }
-            else if (distance > DistanceAttack && _attacking)    //режим приследования, если противник вне радиуса аттаки
-            {
-                _attacking = false;
-                State = AIStateType.Move_Seek;
-
-                if (_figth == null) return;
-                StopCoroutine(_figth);
-                _figth = null;
-            }
-
-            //else if(distance > DistanceDetection)     //Задел на будущее. Если противник выходит из радиуса обнаружения бот переходит в блуждающее состояние
-            //{
-            //    State = AIStateType.Move_Wander;
-            //}
-        }
-
-        //Нанесение урона
-        private void TakeDamage()
-        {
-            if (Target == null)
-            {
-                TargetDead();
-                return;
-            }
-
-            Select_FastOrSlowAttack();
-            Target.GetComponent<UnitManager>().GetDamage(SelectAttack, name);            
-        }
-
-        //Получение урона
-        public bool GetDamage(AttackType attack, string killer)
-        {
-            float point;
-
-            //Сопоставление урона типу атаки
-            if (attack == AttackType.Slow)
-                point = SlowAttackDamage;
-            else if (attack == AttackType.Fast)
-                point = FastAttackDamage;
-            else
-            {
-                Debug.LogError("Неверно указан тип атаки");
-                return false;
-            }
-
-            Debug.Log($"AFTER: Colour = {Colour}, Health = {Health}, Attack type = {Convert.ToString(attack)}, point = {point}");
-
-            Health -= point;
-            if (Health <= 0)
-            {
-                if (Target != null)
-                    Target.GetComponent<UnitManager>().DeadEvent -= TargetDead;     //Отписка от события смерти противника
-
-                _family.Remove(gameObject);
-                gameObject.SetActive(false);
-                StopAllCoroutines();
-
-                DeadEvent?.Invoke();
-
-                return false;
-            }
-            Debug.Log($"BEFORE: Colour = {Colour}, Health = {Health}, Attack type = {Convert.ToString(attack)}, point = {point}");
-
-            return true;
-        }
-
         IEnumerator Fight()
         {
             var r = 0;
             for (; ; )
             {
                 if (!_attacking) yield return null;
-                if (r > 4) Debug.LogError("i'm work: " + r + " my target: " + Target.name);
+             
+                if (r > 4)
+                {
+                    Debug.LogError($"{gameObject.name}{Id} i'm work: {r} my target: {Target.name}");
+                }
+
+                Select_FastOrSlowAttack();
+                _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
                 TakeDamage();
                 r++;
-                yield return new WaitForSeconds(/*60 / FrequencyFastAttackPerMinute*/1);
+                yield return new WaitForSeconds(/*60 / FrequencyFastAttackPerMinute*/5); //to do
             }
         }
 
+        private void Wait()
+        {
+            //transform.position += Vector3.up * Time.deltaTime;
+        }
 
         private void OnSeek()
         {
@@ -234,6 +292,10 @@ namespace Ziggurat
             var desired_velocity = Target.transform.position - transform.position;
             var sqrLength = desired_velocity.sqrMagnitude;
 
+            if(sqrLength < data.ArrivalDistance * data.ArrivalDistance)
+            {
+                desired_velocity = desired_velocity / data.ArrivalDistance;
+            }
 
             var steering = GetUpdateIgnoreAxis(desired_velocity, IgnoreAxisType.Y) - GetVelocity(IgnoreAxisType.Y);
             steering = Vector3.ClampMagnitude(steering, data.MaxVelcity) / Mass;
@@ -269,14 +331,45 @@ namespace Ziggurat
             transform.LookAt(pointTarget);
         }
 
+        private void OnFight()
+        {
+            var velocity = Vector3.zero;
+            SetVelocity(velocity);
+
+            var pointTarget = Target.transform.position;
+            pointTarget.y = transform.position.y;
+            transform.LookAt(pointTarget);
+        }
+
+        //реализация частоты разных типов атаки
         private void Select_FastOrSlowAttack()
         {
             var r = UnityEngine.Random.value;
-            if (r > FrequencyFastAttackPerMinute)
-                SelectAttack = AttackType.Slow;
+            if (FrequencyFastAttackPerMinute < r)
+            {
+                SelectAttack = AttackType.Strong;
+                SelectAnimation = AnimationType.StrongAttack;
+            }
             else
+            {
                 SelectAttack = AttackType.Fast;
+                SelectAnimation = AnimationType.FastAttack;
+            }
+        }
 
+        private bool ChanceChangeAttack(float modification)
+        {
+            var r = UnityEngine.Random.value;
+            if (r < modification)
+                return true;
+            else
+                return false;
+        }
+
+        private void SelectActionPattern(AIStateType action)
+        {
+            State = action;
+            _environment.Moving(1);
         }
 
         private Vector3 UpdateIgnoreAxis(Vector3 velocity, IgnoreAxisType ignore)

@@ -13,8 +13,9 @@ namespace Ziggurat
 		public float MaxVelcity;
 		[Tooltip("Максимальная скорость"), SerializeField, Range(1f, 10f)]
 		public float MaxSpeed;
-		[Tooltip("Расстояние до начала прибытия"), SerializeField, Range(1f, 100f)]
+		[Tooltip("Расстояние начала прибытия"), SerializeField, Range(0.1f, 100f)]
 		public float ArrivalDistance;
+
 		[Tooltip("Расстояние до центра окружности блуждания"), SerializeField, Range(1f, 100f)]
 		public float WanderCenterDistance;
 		[Tooltip("Радиус окружности блуждания"), SerializeField, Range(1f, 100f)]
@@ -22,12 +23,17 @@ namespace Ziggurat
 		[Tooltip("Угл смещения при блуждании"), SerializeField, Range(1f, 100f)]
 		public float WanderAngelRange;
 
+		[Tooltip("Дистанция Обнаружения"), SerializeField, Range(0.5f, 100f)]
+		public float DetectionDistance;
+		[Tooltip("Дистанция атаки"), SerializeField, Range(0.5f, 100f)]
+		public float AttackDistance;
+
 		public GameObject Center;
 	}
 
 	public enum AttackType : byte
     {
-		Slow = 0,
+		Strong = 0,
 		Fast = 1,
     }
 
@@ -35,6 +41,7 @@ namespace Ziggurat
 	{
 		None = 0,
 		Wait = 1,
+		Fight = 229,
 		Move_Seek = 230,
 		Move_Flee = 231,
 		Move_Arrival = 232,

@@ -22,13 +22,13 @@ namespace Ziggurat
         protected virtual void Start()
         {
             uIManager = new UIManager();
-            uIManager.ParamsTransfer(_panelMain, _panelPointHide, _panelPointShow, _buttonSwitch);
+            uIManager.ParamsTransfer(_panelMain, _buttonSwitch);
         }
 
         public void panelMovement()
         {
-            StartCoroutine(uIManager.PanelMove());
-            StopCoroutine(uIManager.PanelMove());
+            StartCoroutine(uIManager.PanelMove(_panelPointHide, _panelPointShow));
+            StopCoroutine(uIManager.PanelMove(_panelPointHide, _panelPointShow));
         }
     }
 
@@ -38,38 +38,38 @@ namespace Ziggurat
 
         private Vector2 _pointHide;
         private Vector2 _pointShow;
-
-        private RectTransform _rTransform;
+        private Transform _rTransform;
         
         private bool _isShow;
 
-        public void ParamsTransfer(GameObject PanelMain, GameObject PanelPointHide, GameObject PanelPointShow, Button ButtonSwitch)
+        public void ParamsTransfer(GameObject PanelMain, Button ButtonSwitch)
         { 
         _isShow = false;
         _rTransform = PanelMain.GetComponent<RectTransform>();
-        _pointHide = PanelPointHide.GetComponent<RectTransform>().position;
-        _pointShow = PanelPointShow.GetComponent<RectTransform>().position;
+        
         _buttonSwitch = ButtonSwitch;
         }
 
-        public IEnumerator PanelMove()
+        public IEnumerator PanelMove(GameObject PanelPointHide, GameObject PanelPointShow)
         {
+            _pointHide = PanelPointHide.GetComponent<RectTransform>().position;
+            _pointShow = PanelPointShow.GetComponent<RectTransform>().position;
             _buttonSwitch.interactable = false;
+
             if (!_isShow)
             {                
-                while (_rTransform.position.y > _pointShow.y + 0.01)
+                while (Vector2.Distance(_pointShow, _rTransform.position) > 0.01f)
                 {
                     _rTransform.position = Vector2.Lerp(_rTransform.position, _pointShow, 0.1f);
-
                     yield return null;
-                }
+                }                
             }
+
             if (_isShow)
             {
-                while (_rTransform.position.y < _pointHide.y - 0.01)
+                while(Vector2.Distance(_pointHide, _rTransform.position) > 0.01f)
                 {
                     _rTransform.position = Vector2.Lerp(_rTransform.position, _pointHide, 0.1f);
-
                     yield return null;
                 }
             }
@@ -80,26 +80,27 @@ namespace Ziggurat
         //public IEnumerator PanelMove()
         //{
         //    _buttonSwitch.interactable = false;
-
         //    if (!_isShow)
-        //    {
-        //        while (1 > 0)
+        //    {                
+        //        while (_rTransform.position.y > _pointShow.y + 0.01)
         //        {
-        //            var d = Vector3.Distance(_pointShow, _rTransform);
-        //            if (d < 0.01f)
-        //                yield return null;
-        //            _rTransform = Vector2.Lerp(_rTransform, _pointShow, 0.1f);
+        //            _rTransform.position = Vector2.Lerp(_rTransform.position, _pointShow, 0.1f);
+
+        //            yield return null;
         //        }
         //    }
-
         //    if (_isShow)
         //    {
-        //        if (Vector3.Distance(_pointHide, _rTransform) < 0.01f)
+        //        while (_rTransform.position.y < _pointHide.y - 0.01)
+        //        {
+        //            _rTransform.position = Vector2.Lerp(_rTransform.position, _pointHide, 0.1f);
+
         //            yield return null;
-        //        _rTransform = Vector2.Lerp(_rTransform, _pointHide, 0.1f);
+        //        }
         //    }
         //    _buttonSwitch.interactable = true;
         //    _isShow = !_isShow;
         //}
+
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Ziggurat
 {
@@ -22,7 +21,8 @@ namespace Ziggurat
         protected override void Start()
         {
             uIManager = new UIManager();
-            uIManager.ParamsTransfer(_panelMain, _panelPointHide, _panelPointShow, _buttonSwitch);
+            uIManager.ParamsTransfer(_panelMain, _buttonSwitch); 
+
             SelectedGate(Colour.Red);
         }
 
