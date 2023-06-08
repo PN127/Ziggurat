@@ -12,9 +12,9 @@ namespace Ziggurat
 		private SteeringBehaviorData _steeringBehaviorData;
         public SteeringBehaviorData GetSteeringBehaviorData => _steeringBehaviorData;
 
-        public static List<GameObject> unitsRed = new List<GameObject>();
-        public static List<GameObject> unitsGreen = new List<GameObject>();
-        public static List<GameObject> unitsBlue = new List<GameObject>();
+        public static List<UnitManager> unitsRed = new List<UnitManager>();
+        public static List<UnitManager> unitsGreen = new List<UnitManager>();
+        public static List<UnitManager> unitsBlue = new List<UnitManager>();
 
         public static GameObject SelectedGate;
 

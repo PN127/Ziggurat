@@ -2558,6 +2558,7 @@ GameObject:
   - component: {fileID: 7971482898358105655}
   - component: {fileID: 7971482898358105654}
   - component: {fileID: 7971482898358105659}
+  - component: {fileID: 1501384463296873292}
   m_Layer: 0
   m_Name: RPGHeroPolyart
   m_TagString: Untagged
@@ -2645,6 +2646,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animator: {fileID: 8067314749199957198}
   _collider: {fileID: 7971482898358105656}
+--- !u!114 &1501384463296873292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7973307358779964746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffdace321aff63a4ebeda5730ffcd494, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 0}
+  MyCanvas: {fileID: 3617667678059601216}
+  mainCamera: {fileID: 0}
+  healt: 0
 --- !u!1 &7973312293858233878
 GameObject:
   m_ObjectHideFlags: 0

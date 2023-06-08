@@ -12,19 +12,21 @@ namespace Ziggurat
     public class UnitManager : NPC
     {
         private UnitEnvironment _environment;
+        [SerializeField]
         private Configuration _config;
         private Rigidbody _rb;
         private SteeringBehaviorData GetSteeringBehaviorData;
-        private List<GameObject> _family;
+        private List<UnitManager> _family;
         private Coroutine _figth;
         private AttackType SelectAttack;
         private AnimationType SelectAnimation;
-        private Slider _sliderHealth;
+
 
         public Transform Target;
+        [SerializeField]
+        private Slider _sliderHealth;
+        [SerializeField]
         private Canvas MyCanvas;
-        public float healt;
-
 
         public float Mass => _rb.mass;
 
@@ -39,13 +41,14 @@ namespace Ziggurat
             _environment = GetComponent<UnitEnvironment>();
             _rb = GetComponent<Rigidbody>();
             GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
+            UIManager.ShowHealth += ShowGealthSlider;
 
             _sliderHealth.maxValue = Health;
             _sliderHealth.value = Health;
             SelectAttack = AttackType.Strong;
             DistanceDetection = GetSteeringBehaviorData.DetectionDistance;
             DistanceAttack = GetSteeringBehaviorData.AttackDistance;
-            
+
 
             switch (Colour)
             {
@@ -62,7 +65,11 @@ namespace Ziggurat
 
         }
 
-       
+        private void ShowGealthSlider(bool on)
+        {
+            _sliderHealth.gameObject.SetActive(on);
+        }
+
         private void FixedUpdate()
         {
             MoveUnity();
@@ -71,7 +78,6 @@ namespace Ziggurat
                 AttackZone();
             else
                 SearchaTarget();
-
             MyCanvas.transform.LookAt(Camera.main.transform);
         }
 
@@ -109,7 +115,7 @@ namespace Ziggurat
             Collider[] _col = Physics.OverlapSphere(transform.position, DistanceDetection, 1 << (int)Masks.Unit);   //создание коллайдер-сферы с фильтром по маске
             foreach (Collider col in _col)  //перебор всех коллайдеров в этой сфере
             {
-                if (Colour != col.GetComponent<NPC>().Colour)
+                if (col.GetComponent<NPC>() && Colour != col.GetComponent<NPC>().Colour)
                 {
                     var distance = Vector3.Distance(gameObject.transform.position, col.transform.position);
                     if (distance < minDistance)
@@ -123,18 +129,18 @@ namespace Ziggurat
                 }
             }
         }
-        
+
         //проверка аттакующей зоны
         private void AttackZone()
         {
             var distance = Vector3.Distance(gameObject.transform.position, Target.transform.position);
-            
+
             if (distance < DistanceAttack && !_attacking)
             {
                 _attacking = true;
                 State = AIStateType.Fight;
                 _figth = StartCoroutine(Fight());
-                                
+
             }
             else if (distance > DistanceAttack && distance < DistanceDetection && _attacking)    //режим приследования, если противник вне радиуса аттаки
             {
@@ -175,7 +181,7 @@ namespace Ziggurat
             float damageCount = -1;
 
             //Сопоставление урона типу атаки
-            switch(SelectAttack)
+            switch (SelectAttack)
             {
                 case AttackType.Strong:
                     damageCount = StrongAttackDamage;
@@ -189,45 +195,38 @@ namespace Ziggurat
                 Debug.LogWarning($"Неверно указан тип аттаки или урон выбранной атаки. Проверьте данные");
             }
 
-            if (ChanceChangeAttack(ChanceMiss))
-            {
-                Debug.LogWarning($"{Colour}: I'm missing :( ");
-                return;
-            }
+            if (ChanceChangeAttack(ChanceMiss)) return;
 
             if (ChanceChangeAttack(ChanceCriticalDamage))
             {
                 damageCount += damageCount;
-                Debug.LogWarning($"{Colour}: x2 Damage {damageCount} to {Target.GetComponent<UnitManager>().Colour}"/*to do*/);
             }
 
 
-            Target.GetComponent<UnitManager>().GetDamage(damageCount, name/*to do*/);
+            Target.GetComponent<UnitManager>().GetDamage(damageCount);
         }
 
         //Получение урона
-        public void GetDamage(float damageCount, string killer/*to do*/)
+        public void GetDamage(float damageCount)
         {
             
             Health -= damageCount;
             _sliderHealth.value = Health;
             if (Health <= 0)
             {
-                if (Target != null)
+
+                if (Target != null && Target.GetComponent<NPC>())
                     Target.GetComponent<UnitManager>().DeadEvent -= TargetDead;     //Отписка от события смерти цели
 
                 SelectAnimation = AnimationType.Die;
-                _family.Remove(gameObject);
-                //gameObject.SetActive(false);
+                _family.Remove(this);
                 StopAllCoroutines();
 
                 DeadEvent?.Invoke();
 
-                Debug.LogWarning($"I {Colour} dead. My killer - {killer}, Damage {damageCount}"/*to do*/);
                 _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
                 Destroy(this);
             }
-            Debug.LogWarning($"{killer} - Trigger: {gameObject.name}, Damage {damageCount}"/*to do*/);
 
         }
 
@@ -259,7 +258,7 @@ namespace Ziggurat
                 _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
                 TakeDamage();
                 r++;
-                yield return new WaitForSeconds(/*60 / FrequencyFastAttackPerMinute*/5); //to do
+                yield return new WaitForSeconds(5);//to do
             }
         }
 
@@ -336,6 +335,7 @@ namespace Ziggurat
             var velocity = Vector3.zero;
             SetVelocity(velocity);
 
+            if (Target == null) return;
             var pointTarget = Target.transform.position;
             pointTarget.y = transform.position.y;
             transform.LookAt(pointTarget);

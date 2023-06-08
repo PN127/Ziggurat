@@ -10,15 +10,18 @@ namespace Ziggurat
     {
         private Panel_Static ps;
         private SteeringBehaviorData GetSteeringBehaviorData;
-        private List<GameObject> _units;
+        private List<UnitManager> _units;
 
         [SerializeField]
         private GameObject _unit;
         [SerializeField]
-        private GameObject _panel;
+        private Transform _spawnPoint;
+        [SerializeField]
+        private GameObject _panel;        
         [SerializeField]
         private Colour _gateColour;
         public Colour Get_gateColour => _gateColour;
+        
 
         [Space]
         [SerializeField, Header("Передача параметров юнитам")]
@@ -37,14 +40,7 @@ namespace Ziggurat
         private Slider _chanceCriticalDamage;
         [SerializeField]
         private Slider _frequencyFastAttackPerMinute;
-
-        [Space]
-        [SerializeField, Header("Реализация здоровья")]
-        private Camera camera; //to do
-
-
-
-        
+      
 
         void Start()
         {
@@ -79,10 +75,11 @@ namespace Ziggurat
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 1)
+            while (a < 5)
             {
                 var data = GetSteeringBehaviorData;
-                var unit = Instantiate(_unit);
+                var unit = Instantiate(_unit, _spawnPoint.position, _spawnPoint.rotation);
+                //unit.transform.position = _spawnPoint.position;
                 var unitManager = unit.GetComponent<UnitManager>();
                 unitManager.Health = float.Parse(_healthText.text);
                 unitManager.Speed = float.Parse(_speedText.text);
@@ -96,7 +93,7 @@ namespace Ziggurat
                 unitManager.ChanceCriticalDamage = _chanceCriticalDamage.value;
                 unitManager.DeadEvent += unitDead;
                 unitManager.Id = a;
-                _units.Add(unit);
+                _units.Add(unitManager);
                 a++;
                 ps.SetCountToDictionary(true, _gateColour);
                 ps.SetTimeToCreat(_gateColour, _spawnReload.value);
