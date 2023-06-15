@@ -61,25 +61,21 @@ namespace Ziggurat
             }
             StartCoroutine(CreateNewUnit());
         }
-
-        void Update()
-        {
-            
-        }
-
+        
+        //Передача информации в панель статистики
         private void unitDead()
         {
             ps.SetCountToDictionary(false, _gateColour);
         }
 
+        //Короутина создания юнитов
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 5)
+            while (a < 10)
             {
                 var data = GetSteeringBehaviorData;
                 var unit = Instantiate(_unit, _spawnPoint.position, _spawnPoint.rotation);
-                //unit.transform.position = _spawnPoint.position;
                 var unitManager = unit.GetComponent<UnitManager>();
                 unitManager.Health = float.Parse(_healthText.text);
                 unitManager.Speed = float.Parse(_speedText.text);

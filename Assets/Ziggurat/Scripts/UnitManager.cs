@@ -41,7 +41,7 @@ namespace Ziggurat
             _environment = GetComponent<UnitEnvironment>();
             _rb = GetComponent<Rigidbody>();
             GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
-            UIManager.ShowHealth += ShowGealthSlider;
+            UIManager.ShowHealth += ShowHealthSlider;
 
             _sliderHealth.maxValue = Health;
             _sliderHealth.value = Health;
@@ -50,6 +50,7 @@ namespace Ziggurat
             DistanceAttack = GetSteeringBehaviorData.AttackDistance;
 
 
+            //Определение принадлежности юнита к цвету
             switch (Colour)
             {
                 case Colour.Red:
@@ -63,15 +64,12 @@ namespace Ziggurat
                     break;
             }
 
-        }
-
-        private void ShowGealthSlider(bool on)
-        {
-            _sliderHealth.gameObject.SetActive(on);
-        }
+        }       
 
         private void FixedUpdate()
         {
+            if (gameObject.layer == 0) return;
+                
             MoveUnity();
 
             if (Target != null && Target.GetComponent<NPC>() && Target.gameObject.activeSelf)   //проверка на соответствие противника
@@ -100,9 +98,7 @@ namespace Ziggurat
                     break;
                 case AIStateType.Fight:
                     OnFight();
-                    break;
-                    //case AIStateType.Wait:                   
-                    //    break;
+                    break;                   
 
             }
 
@@ -160,14 +156,8 @@ namespace Ziggurat
                 StopCoroutine(_figth);
                 _figth = null;
 
-            }
-
-            //else if(distance > DistanceDetection)     //Задел на будущее. Если противник выходит из радиуса обнаружения бот переходит в блуждающее состояние
-            //{
-            //    State = AIStateType.Move_Wander;
-            //}
+            }            
         }
-
 
         //Нанесение урона
         private void TakeDamage()
@@ -222,13 +212,13 @@ namespace Ziggurat
                 _family.Remove(this);
                 StopAllCoroutines();
 
-                DeadEvent?.Invoke();
-
                 _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
-                Destroy(this);
+                gameObject.layer = 0;
+
+                DeadEvent?.Invoke();               
             }
 
-        }
+        }       
 
         //поведение бота после смерти цели
         private void TargetDead()
@@ -237,11 +227,11 @@ namespace Ziggurat
             Target = null;
             _attacking = false;
 
-            if (_figth == null) return;
-            StopCoroutine(_figth);
+            if (_figth != null) StopCoroutine(_figth);
             _figth = null;
         }
 
+        //Короутина атаки
         IEnumerator Fight()
         {
             var r = 0;
@@ -260,11 +250,6 @@ namespace Ziggurat
                 r++;
                 yield return new WaitForSeconds(5);//to do
             }
-        }
-
-        private void Wait()
-        {
-            //transform.position += Vector3.up * Time.deltaTime;
         }
 
         private void OnSeek()
@@ -329,7 +314,6 @@ namespace Ziggurat
             pointTarget.y = transform.position.y;
             transform.LookAt(pointTarget);
         }
-
         private void OnFight()
         {
             var velocity = Vector3.zero;
@@ -366,12 +350,6 @@ namespace Ziggurat
                 return false;
         }
 
-        private void SelectActionPattern(AIStateType action)
-        {
-            State = action;
-            _environment.Moving(1);
-        }
-
         private Vector3 UpdateIgnoreAxis(Vector3 velocity, IgnoreAxisType ignore)
         {
             if (ignore == IgnoreAxisType.None) return velocity;
@@ -394,6 +372,9 @@ namespace Ziggurat
             _rb.velocity = UpdateIgnoreAxis(velocity, ignore);
 
         }
-
+        private void ShowHealthSlider(bool on)
+        {
+            _sliderHealth.gameObject.SetActive(on);
+        }
     }
 }
