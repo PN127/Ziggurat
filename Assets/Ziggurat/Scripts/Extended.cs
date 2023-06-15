@@ -80,8 +80,6 @@ namespace Ziggurat
 		Unit = 9
     }
 
-
-
 	[System.Serializable]
 	public class AnimationKeyDictionary : SerializableDictionaryBase<AnimationType, string> { }
 }

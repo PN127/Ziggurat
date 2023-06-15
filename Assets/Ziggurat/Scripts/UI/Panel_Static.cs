@@ -32,7 +32,7 @@ namespace Ziggurat
         {
             RayCast.ShowEvent += (colour) => SelectedGate(colour);
 
-            _timeToCreate_from_Colour = new Dictionary<Colour, float>();
+            _timeToCreate_from_Colour = new Dictionary<Colour, float>(); //время до создания юнитов по цветам
             _countLife_from_Colour = new Dictionary<Colour, int>();
             _countDead_from_Colour = new Dictionary<Colour, int>();
 
@@ -41,16 +41,28 @@ namespace Ziggurat
             SetStartValue();
         }
 
+        //заполнение словарей
+        private void SetStartValue()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                _timeToCreate_from_Colour.Add((Colour)i, 0);
+                _countLife_from_Colour.Add((Colour)i, 0);
+                _countDead_from_Colour.Add((Colour)i, 0);
+            }
+        }
+
         private void FixedUpdate()
         {
             SelectedGate(_lastColour);
 
+            //Таймер до создания следующего юнита
             for (int i = 0; i < 3; i++)
-            {
                 _timeToCreate_from_Colour[(Colour)i] -= Time.deltaTime;
-            }
+            
         }
 
+        //Учет живых и умерших юнитов
         public void SetCountToDictionary(bool life, Colour colour)
         {
             if (life)
@@ -62,24 +74,15 @@ namespace Ziggurat
                 _countLife_from_Colour[colour] -= 1;
                 _countDead_from_Colour[colour] += 1;
             }
-        }
+        }        
 
-        private void SetStartValue()
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                _timeToCreate_from_Colour.Add((Colour)i, 0);
-                _countLife_from_Colour.Add((Colour)i, 0);
-                _countDead_from_Colour.Add((Colour)i, 0);
-            }
-        }
-
+        //обновление таймера при создании нового юнита
         public void SetTimeToCreat(Colour colour, float time)
         {
             _timeToCreate_from_Colour[colour] = (int)time;
-        }        
-        
+        }                
 
+        //изменение отображения в панеле при выборе зикурата
         private void SelectedGate(Colour colour)
         {
             _lastColour = colour;
@@ -107,7 +110,7 @@ namespace Ziggurat
             }
         }
 
-
+        //метод для кнопки очистки статистики
         public void _clear_CountDead()
         {
             _countDead_from_Colour[_lastColour] = 0;

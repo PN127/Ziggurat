@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Ziggurat
 {
+    //родительский класс для юнитов
     public class NPC : MonoBehaviour
-    {
-        
+    {        
         public float Health { get; set; }
         public float Speed { get; set; }
         public float FastAttackDamage { get; set; }
@@ -18,11 +18,11 @@ namespace Ziggurat
         public float ChanceMiss { get; set; }
         public float ChanceCriticalDamage { get; set; }
 
-        public int Id { get; set; }
+        //id можно использовать для отслеживания ошибок
+        public string Id { get; set; }
 
         public Colour Colour { get; set; }
         public AIStateType State { get; set; }
-
-        
+               
     }
 }

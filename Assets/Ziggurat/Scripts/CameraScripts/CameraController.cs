@@ -28,7 +28,6 @@ namespace Ziggurat
             _controls.Camera.Scale.performed += OnFocus;
             _controls.Camera.ActiveRotation.performed += OnRightClick;
             _controls.Camera.ActiveRotation.canceled += OnRightClick;
-            //    _controls.Camera.Rotate.performed += OnLeftClick;
         }
 
         private void Start()

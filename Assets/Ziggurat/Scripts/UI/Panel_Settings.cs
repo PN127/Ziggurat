@@ -18,6 +18,7 @@ namespace Ziggurat
             RayCast.ShowEvent += (colour) => SelectedGate(colour);
         }
 
+        //переписка родительского метода. Выбирается зиккурат для отображения изначальной статистики 
         protected override void Start()
         {
             uIManager = new UIManager();
@@ -26,6 +27,7 @@ namespace Ziggurat
             SelectedGate(Colour.Red);
         }
 
+        //отображение выбранного зиккурата
         private void SelectedGate(Colour colour)
         {
             _panelRed.SetActive(false);

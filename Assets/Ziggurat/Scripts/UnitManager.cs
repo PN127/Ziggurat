@@ -30,7 +30,8 @@ namespace Ziggurat
 
         public float Mass => _rb.mass;
 
-        private bool _attacking;
+        private bool _attacking;        
+        public string id;
 
         public delegate void NotificationDeadDelegate();
         public event NotificationDeadDelegate DeadEvent;
@@ -43,6 +44,7 @@ namespace Ziggurat
             GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
             UIManager.ShowHealth += ShowHealthSlider;
 
+            id = Id;
             _sliderHealth.maxValue = Health;
             _sliderHealth.value = Health;
             SelectAttack = AttackType.Strong;
@@ -63,8 +65,14 @@ namespace Ziggurat
                     _family = ConfigurationManager.unitsBlue;
                     break;
             }
+        }
 
-        }       
+        private void OnDisable()
+        {
+            UIManager.ShowHealth -= ShowHealthSlider;
+            if (Target != null && Target.GetComponent<NPC>())
+                Target.GetComponent<UnitManager>().DeadEvent -= TargetDead;
+        }
 
         private void FixedUpdate()
         {
@@ -121,7 +129,7 @@ namespace Ziggurat
                     }
                     State = AIStateType.Move_Seek;
                     Target.GetComponent<UnitManager>().DeadEvent += TargetDead;
-                    Debug.Log($"my name - {gameObject.name}. Target detected {Target.name}");
+                    Debug.Log($"i'm - {id}. Target detected {Target.GetComponent<UnitManager>().id}");
                 }
             }
         }
@@ -206,7 +214,7 @@ namespace Ziggurat
             {
 
                 if (Target != null && Target.GetComponent<NPC>())
-                    Target.GetComponent<UnitManager>().DeadEvent -= TargetDead;     //Отписка от события смерти цели
+                    Target.GetComponent<UnitManager>().DeadEvent -= TargetDead; //Отписка от события смерти цели
 
                 SelectAnimation = AnimationType.Die;
                 _family.Remove(this);
@@ -227,7 +235,7 @@ namespace Ziggurat
             Target = null;
             _attacking = false;
 
-            if (_figth != null) StopCoroutine(_figth);
+            if (_figth != null) StopCoroutine(_figth); //to do || остался баг, при котором вызывается ивент у цели, которая уже мертва, хотя отписка происходит в GetDamage и OnDisable
             _figth = null;
         }
 
@@ -238,18 +246,45 @@ namespace Ziggurat
             for (; ; )
             {
                 if (!_attacking) yield return null;
-             
-                if (r > 4)
-                {
-                    Debug.LogError($"{gameObject.name}{Id} i'm work: {r} my target: {Target.name}");
-                }
 
                 Select_FastOrSlowAttack();
                 _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
                 TakeDamage();
                 r++;
-                yield return new WaitForSeconds(5);//to do
+                yield return new WaitForSeconds(5);
             }
+        }
+              
+        //реализация частоты разных типов атаки
+        private void Select_FastOrSlowAttack()
+        {
+            var r = UnityEngine.Random.value;
+            if (FrequencyFastAttackPerMinute < r)
+            {
+                SelectAttack = AttackType.Strong;
+                SelectAnimation = AnimationType.StrongAttack;
+            }
+            else
+            {
+                SelectAttack = AttackType.Fast;
+                SelectAnimation = AnimationType.FastAttack;
+            }
+        }
+
+        //шанс крита или промаха
+        private bool ChanceChangeAttack(float modification)
+        {
+            var r = UnityEngine.Random.value;
+            if (r < modification)
+                return true;
+            else
+                return false;
+        }
+        
+        //включает или выключает отображение здоровья
+        private void ShowHealthSlider(bool on)
+        {
+            _sliderHealth.gameObject.SetActive(on);
         }
 
         private void OnSeek()
@@ -276,7 +311,7 @@ namespace Ziggurat
             var desired_velocity = Target.transform.position - transform.position;
             var sqrLength = desired_velocity.sqrMagnitude;
 
-            if(sqrLength < data.ArrivalDistance * data.ArrivalDistance)
+            if (sqrLength < data.ArrivalDistance * data.ArrivalDistance)
             {
                 desired_velocity = desired_velocity / data.ArrivalDistance;
             }
@@ -325,31 +360,6 @@ namespace Ziggurat
             transform.LookAt(pointTarget);
         }
 
-        //реализация частоты разных типов атаки
-        private void Select_FastOrSlowAttack()
-        {
-            var r = UnityEngine.Random.value;
-            if (FrequencyFastAttackPerMinute < r)
-            {
-                SelectAttack = AttackType.Strong;
-                SelectAnimation = AnimationType.StrongAttack;
-            }
-            else
-            {
-                SelectAttack = AttackType.Fast;
-                SelectAnimation = AnimationType.FastAttack;
-            }
-        }
-
-        private bool ChanceChangeAttack(float modification)
-        {
-            var r = UnityEngine.Random.value;
-            if (r < modification)
-                return true;
-            else
-                return false;
-        }
-
         private Vector3 UpdateIgnoreAxis(Vector3 velocity, IgnoreAxisType ignore)
         {
             if (ignore == IgnoreAxisType.None) return velocity;
@@ -372,9 +382,6 @@ namespace Ziggurat
             _rb.velocity = UpdateIgnoreAxis(velocity, ignore);
 
         }
-        private void ShowHealthSlider(bool on)
-        {
-            _sliderHealth.gameObject.SetActive(on);
-        }
+        
     }
 }

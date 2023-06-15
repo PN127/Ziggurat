@@ -88,7 +88,7 @@ namespace Ziggurat
                 unitManager.ChanceMiss = _chanceMiss.value;
                 unitManager.ChanceCriticalDamage = _chanceCriticalDamage.value;
                 unitManager.DeadEvent += unitDead;
-                unitManager.Id = a;
+                unitManager.Id = $"{_gateColour}.{a}";
                 _units.Add(unitManager);
                 a++;
                 ps.SetCountToDictionary(true, _gateColour);

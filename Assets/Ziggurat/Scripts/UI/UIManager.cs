@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace Ziggurat
 {
+    //класс для панелей, которые будут двигаться
     class MovingPanel : MonoBehaviour
     {
         [SerializeField]
@@ -53,6 +54,7 @@ namespace Ziggurat
             _toggleShowHealth.onValueChanged.AddListener(delegate (bool on) { ShowSlidersHealth(on); });
         }
 
+        //передача параметров для взаимодействия класса с платформой
         public void ParamsTransfer(GameObject PanelMain, Button ButtonSwitch)
         {
             _isShow = false;
@@ -61,6 +63,7 @@ namespace Ziggurat
             _buttonSwitch = ButtonSwitch;
         }
 
+        //передвижение панели
         public IEnumerator PanelMove(GameObject PanelPointHide, GameObject PanelPointShow)
         {
             _pointHide = PanelPointHide.GetComponent<RectTransform>().position;
@@ -68,26 +71,27 @@ namespace Ziggurat
             _buttonSwitch.interactable = false;
 
             if (!_isShow)
-            {                
+            {
                 while (Vector2.Distance(_pointShow, _rTransform.position) > 0.01f)
                 {
                     _rTransform.position = Vector2.Lerp(_rTransform.position, _pointShow, 0.1f);
                     yield return null;
-                }                
+                }
             }
-
             if (_isShow)
             {
-                while(Vector2.Distance(_pointHide, _rTransform.position) > 0.01f)
+                while (Vector2.Distance(_pointHide, _rTransform.position) > 0.01f)
                 {
                     _rTransform.position = Vector2.Lerp(_rTransform.position, _pointHide, 0.1f);
                     yield return null;
                 }
             }
+
             _buttonSwitch.interactable = true;
             _isShow = !_isShow;
         }
 
+        //метод для кнопки "Убить всех"
         public void AllKill()
         {
             while (ConfigurationManager.unitsRed.Count > 0)
@@ -104,8 +108,10 @@ namespace Ziggurat
             {
                 var unit = ConfigurationManager.unitsBlue[0];
                 unit.GetDamage(unit.Health);
-            }            
+            }
         }
+
+        //вызов ивента для отображения здоровья
         public void ShowSlidersHealth(bool on)
         {
             ShowHealth?.Invoke(on);

@@ -34,6 +34,7 @@ namespace Ziggurat
             _camera = Camera.main;
         }
 
+        //отлавливает выбор зиккурата для отображения статистики и настройки зиккурата
         private void SelectGate()
         {
             var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
