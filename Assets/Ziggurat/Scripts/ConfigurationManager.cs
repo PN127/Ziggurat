@@ -18,6 +18,7 @@ namespace Ziggurat
 
         public static GameObject SelectedGate;
 
+        public bool ShowHealth { get; set; }
 
         private void Awake()
         {
@@ -25,6 +26,14 @@ namespace Ziggurat
                 Destroy(this);
             else
                 Self = this;
+        }
+
+        public delegate void NotificationDeadDelegate(UnitManager unit);
+        public event NotificationDeadDelegate DeadEvent;
+
+        public void Die(UnitManager unit)
+        {
+            DeadEvent?.Invoke(unit);
         }
     }
 }

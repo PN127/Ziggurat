@@ -40,11 +40,16 @@ namespace Ziggurat
         private Slider _chanceCriticalDamage;
         [SerializeField]
         private Slider _frequencyFastAttackPerMinute;
-      
+                
+        private void OnDestroy()
+        {
+            ConfigurationManager.Self.DeadEvent -= unitDead;
+        }        
 
         void Start()
         {
             GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
+            ConfigurationManager.Self.DeadEvent += unitDead;
             ps = new Panel_Static();
 
             switch (_gateColour)
@@ -63,8 +68,10 @@ namespace Ziggurat
         }
         
         //Передача информации в панель статистики
-        private void unitDead()
+        private void unitDead(UnitManager unit)
         {
+            if (!_units.Contains(unit)) return;
+            
             ps.SetCountToDictionary(false, _gateColour);
         }
 
@@ -72,7 +79,7 @@ namespace Ziggurat
         IEnumerator CreateNewUnit()
         {
             int a = 0;
-            while (a < 10)
+            while (1 > 0)
             {
                 var data = GetSteeringBehaviorData;
                 var unit = Instantiate(_unit, _spawnPoint.position, _spawnPoint.rotation);
@@ -87,7 +94,6 @@ namespace Ziggurat
                 unitManager.State = AIStateType.Move_Seek;
                 unitManager.ChanceMiss = _chanceMiss.value;
                 unitManager.ChanceCriticalDamage = _chanceCriticalDamage.value;
-                unitManager.DeadEvent += unitDead;
                 unitManager.Id = $"{_gateColour}.{a}";
                 _units.Add(unitManager);
                 a++;

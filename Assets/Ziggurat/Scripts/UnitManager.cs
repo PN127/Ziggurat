@@ -33,16 +33,23 @@ namespace Ziggurat
         private bool _attacking;        
         public string id;
 
-        public delegate void NotificationDeadDelegate();
-        public event NotificationDeadDelegate DeadEvent;
+        private void OnEnable()
+        {
+            UIManager.ShowHealth += ShowHealthSlider;
+            ConfigurationManager.Self.DeadEvent += CompareTarget;
+        }       
 
+        private void OnDestroy()
+        {
+            UIManager.ShowHealth -= ShowHealthSlider;
+            ConfigurationManager.Self.DeadEvent -= CompareTarget;            
+        }
 
         void Start()
         {
             _environment = GetComponent<UnitEnvironment>();
             _rb = GetComponent<Rigidbody>();
-            GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;
-            UIManager.ShowHealth += ShowHealthSlider;
+            GetSteeringBehaviorData = ConfigurationManager.Self.GetSteeringBehaviorData;            
 
             id = Id;
             _sliderHealth.maxValue = Health;
@@ -50,7 +57,7 @@ namespace Ziggurat
             SelectAttack = AttackType.Strong;
             DistanceDetection = GetSteeringBehaviorData.DetectionDistance;
             DistanceAttack = GetSteeringBehaviorData.AttackDistance;
-
+            ShowHealthSlider(ConfigurationManager.Self.ShowHealth);
 
             //Определение принадлежности юнита к цвету
             switch (Colour)
@@ -65,14 +72,7 @@ namespace Ziggurat
                     _family = ConfigurationManager.unitsBlue;
                     break;
             }
-        }
-
-        private void OnDisable()
-        {
-            UIManager.ShowHealth -= ShowHealthSlider;
-            if (Target != null && Target.GetComponent<NPC>())
-                Target.GetComponent<UnitManager>().DeadEvent -= TargetDead;
-        }
+        }        
 
         private void FixedUpdate()
         {
@@ -128,7 +128,6 @@ namespace Ziggurat
                         Target = col.transform;
                     }
                     State = AIStateType.Move_Seek;
-                    Target.GetComponent<UnitManager>().DeadEvent += TargetDead;
                     Debug.Log($"i'm - {id}. Target detected {Target.GetComponent<UnitManager>().id}");
                 }
             }
@@ -199,34 +198,36 @@ namespace Ziggurat
             {
                 damageCount += damageCount;
             }
-
-
             Target.GetComponent<UnitManager>().GetDamage(damageCount);
         }
 
         //Получение урона
         public void GetDamage(float damageCount)
-        {
-            
+        {            
             Health -= damageCount;
             _sliderHealth.value = Health;
             if (Health <= 0)
             {
-
-                if (Target != null && Target.GetComponent<NPC>())
-                    Target.GetComponent<UnitManager>().DeadEvent -= TargetDead; //Отписка от события смерти цели
+                ConfigurationManager.Self.Die(this);
 
                 SelectAnimation = AnimationType.Die;
                 _family.Remove(this);
                 StopAllCoroutines();
 
                 _environment.StartAnimation(_config.GetDictionary[SelectAnimation]);
-                gameObject.layer = 0;
-
-                DeadEvent?.Invoke();               
+                gameObject.layer = 0;                
             }
 
-        }       
+        }
+
+        //проверка умершего юнита на соответствие цели
+        private void CompareTarget(UnitManager unit)
+        {
+            if (Target == null) return;
+            if (unit != Target.GetComponent<UnitManager>()) return;
+            TargetDead();
+            //не добавил сразу в TargetDead, потому что TargetDead вызывается еще в TakeDamage
+        }
 
         //поведение бота после смерти цели
         private void TargetDead()
@@ -235,7 +236,7 @@ namespace Ziggurat
             Target = null;
             _attacking = false;
 
-            if (_figth != null) StopCoroutine(_figth); //to do || остался баг, при котором вызывается ивент у цели, которая уже мертва, хотя отписка происходит в GetDamage и OnDisable
+            if (_figth != null) StopCoroutine(_figth);
             _figth = null;
         }
 
